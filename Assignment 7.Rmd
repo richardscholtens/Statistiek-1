@@ -1,0 +1,455 @@
+---
+title: "Statistiek I - Lab session 7"
+author: "Dion Theodoridis (s3121534)"
+date: "Generated on: `r date()`"
+output: 
+  html_document:
+    toc: true
+    code_folding: show
+    toc_float: 
+        collapsed: false
+        smooth_scroll: true
+    number_sections: true
+---
+
+# Exercise 1
+
+```{r, fig.width=5, fig.height=5}
+download.file('http://www.let.rug.nl/wieling/Statistiek-I/full.rda','full.rda')
+load('full.rda',verbose=T)
+library(effsize)
+library(vcd)
+library(psych)
+head(full)
+str(full)
+summary(full)
+boxplot(full$accent_strength_self, col="red")
+qqnorm(full$accent_strength_self)
+qqline(full$accent_strength_self)
+mean(full$accent_strength_self)
+sd(full$accent_strength_self)
+quantile(full$accent_strength_self)
+boxplot(full$english_score_self, col="red")
+qqnorm(full$english_score_self)
+qqline(full$english_score_self)
+mean(full$english_score_self)
+sd(full$english_score_self)
+quantile(full$english_score_self)
+table(full$spk_frisian)
+barplot(table(full$spk_frisian), col=rainbow(2))
+```
+
+# Exercise 2 
+
+```{r, fig.width=5, fig.height=5}
+(tbl <- table(full$spk_frisian, full$study))
+chisq.test(tbl)$expected
+prop.table(tbl)
+prop.table(tbl, 1)
+prop.table(tbl, 2)
+barplot(tbl, legend = c("CIS", "IS", "LING", "OTHER"), beside = T, col=rainbow(4))
+fisher.test(tbl)
+assocstats(tbl)
+chisq.test(tbl)$stdres
+```
+
+In this excercise will try to answer the following question:
+
+Is there a relationship between speaking Frisian and study?
+
+
+We will look at speaking Friasian (2 levels: yes, no) and study (4 levels: CIS, IS, LING, OTHER) of students. The sample exsists out of 195 students from the university of Groningen who follow the Statistics 1 course at the faculty of Arts who filled in a questionnaire from which the data was extracted. We are going to look if speaking Frisian and the study of the students are dependent.
+
+$H_0$: Speaking Frisian and the study of the students are independent.  
+$H_a$: Speaking Frisian and the study of the students are dependent.
+
+
+$\alpha$ = 0.05
+
+
+As both variables are nominal, and the expected frequency of each combination was'nt equal or greater than 5, we assessed the dependence of the two variables using the Fisher's exact test.
+
+
+p = 0.4832.
+Cramer's V = 0.111
+
+The p-value is higher than the significance level of 0.05 and therefor we do not reject $H_0$.
+
+Conclusion:
+
+Speaking Frisian and the study of students are independent from one another. T
+
+The difference from the expected distribution was greatest for the OTHER group: there were many more Frisian speaking students than expected. Cramers V states that the effectsize is small to medium and therefor we can put aside the alternative hypothesis.
+
+
+# Exercise 3 
+
+```{r, fig.width=5, fig.height=5}
+table(full$spk_frisian)
+boxplot(full[full$spk_frisian == "Y",]$english_grade, full[full$spk_frisian == "N",]$english_grade, names = c("Frisian","Non-Frisian"), col="red")
+qqnorm(full[full$spk_frisian == "Y",]$english_grade, main = 'Frisian')
+qqline(full[full$spk_frisian == "Y",]$english_grade)
+qqnorm(full[full$spk_frisian == "N",]$english_grade, main = 'Non-Frisian')
+qqline(full[full$spk_frisian == "N",]$english_grade)
+shapiro.test(full[full$spk_frisian == "Y",]$english_grade)
+shapiro.test(full[full$spk_frisian == "N",]$english_grade)
+wilcox.test(full[full$spk_frisian == "Y",]$english_grade, full[full$spk_frisian == "N",]$english_grade, alternative = "greater")
+cliff.delta(full[full$spk_frisian == "Y",]$english_grade, full[full$spk_frisian == "N",]$english_grade)
+```
+
+In this excercise will try to answer the following question:
+
+Is the English grade of people who speak Frisian higher than those who do not?
+
+
+We will look at the English grade to determine if it is higher for the Frisian speaking students than the English grade of non-Frisian speaking students. The sample exsists out of 195 students from the university of Groningen who follow the Statistics 1 course at the faculty of Arts who filled in a questionnaire from which the data was extracted. 
+
+
+$H_0$: The English grade of Frisian speaking students are the same as the English grade of non-Frisian speaking students.
+$H_a$: The English grade of Frisian speaking students are higher than the English grade of non-Frisian speaking students.
+
+$H_0$: $\mu_y$ = $\mu_n$
+$H_a$: $\mu_y$ > $\mu_n$
+
+$\alpha$ = 0.05
+
+
+We use the Mann-Whitney U test because we use numerical data which can be measured in ratio, do not know the standard deviation, the groups are not normally distributed and one of the groups is below the sample minimum size of 30.
+
+
+p-value = 0.2138
+U-value = 1931
+delta estimate: 0.1034286 (negligible)
+
+
+
+The p-value is higher than the significance level of 0.05 and therefor we do not reject $H_0$.
+
+Conlusion:
+
+The p-value is below the significance level and the effectsize negligible. This means it couldn't be noticed with the naked eyes and therefor we do not reject $H_0$.
+
+# Exercise 4
+
+```{r, fig.width=5, fig.height=5}
+boxplot(full$english_score, full$english_score_self, names = c("English Score","English Score Self"), col=rainbow(2))
+mean(full$english_score)
+mean(full$english_score_self)
+qqnorm(full$english_score)
+qqline(full$english_score)
+qqnorm(full$english_score_self)
+qqline(full$english_score_self)
+t.test(full$english_score, full$english_score_self, paired = TRUE)
+cohen.d(full$english_score, full$english_score_self)
+```
+
+
+In this excercise will try to answer the following question:
+
+What is the relation between english_score and english_score_self?
+
+
+We will look at the English score and the self predicted English score of one sample group. The sample exsists out of 195 students from the university of Groningen who follow the Statistics 1 course at the faculty of Arts who filled in a questionnaire from which the data was extracted. We are going to look if there is a difference between the English score and the self predicted English score of the students.
+
+$H_0$: The English score is the same as the self predicted English score.
+$H_a$: The English score is different than the self predicted English score.
+
+$H_0$: $\mu_e$ = $\mu_s$
+$H_a$: $\mu_e$ $\neq$ $\mu_s$
+
+$\alpha$ = 0.05
+
+We use a one sided paired sample t-test because we want to determine if one set of data is different than the other set of data of the same sample without knowing the standard deviation and where the arguments are numerical and can be measured in ratio. The qqplot determines that the distribution is is not close to normal which means the samples do deviate from normality but because the sample size is above 30 the paired sample t-test can still be used. 
+
+Results: 
+
+t = -6.1371
+df = 194
+p-value = 4.642e-09
+confidence interval = -0.3730624, -0.1915987
+mean of the differences = -0.2823305
+cohens d estimate = -0.2453474 (small)
+
+
+The p-value is lower than the significance level of 0.05 and therefor we do reject $H_0$ and accept $H_a$.
+
+The effectsize is -0.2453474 (small) 
+
+Conlusion:
+
+The English score is different from the self predicted English score. The p-value is far below the significance level which means the students mis predicted their own English scores. The effectsizze is small but noticable. Even though we must accept $H_a$ the effectsize isn't that high and could be disregarded.
+
+
+# Exercise 5
+
+```{r, fig.width=5, fig.height=5}
+SATSdifficulty <- full[,c("Q6", "Q8", "Q22", "Q24", "Q30", "Q34", "Q36")]
+SATSvalue <- full[,c("Q7", "Q9", "Q10", "Q13", "Q16", "Q17", "Q21", "Q25", "Q33")]
+alpha(SATSdifficulty)
+alpha(SATSvalue)
+full$SATSvalue <- ((8-full$Q7)+full$Q9 + full$Q10 + (8-full$Q13) + (8-full$Q16) + full$Q17 + (8-full$Q21) + (8-full$Q25) + (8-full$Q33))/7
+full$SATSdifficulty <- (full$Q6 + (8-full$Q8) + full$Q22 + (8-full$Q24) + (8-full$Q30) + (8-full$Q34) + (8-full$Q36))/7
+head(full)
+cor(full$SATSvalue, full$SATSdifficulty, use = "pairwise.complete.obs")
+```
+
+Because the SATSdifficulty and SATSvalue are both lower than 0.7 we can state that the reliability is not acceptable.
+The Raw alpha is 0.11 and -0.11. In SATSdifficulty, Q6 and Q22 should be dropped and in SATSvalue, Q9 Q10 Q17.  
+The correlation between SATSvalue and SATSdifficulty is 0.2211525.
+
+# Excercise 6
+
+```{r, fig.width=5, fig.height=5}
+class(full$english_score)
+table(full$spk_frisian)
+frisian <- full[full$spk_frisian == "Y",]
+non_frisian <- full[full$spk_frisian == "N",]
+mean(frisian$english_score)
+mean(non_frisian$english_score)
+qqnorm(frisian$english_score)
+qqline(frisian$english_score)
+boxplot(frisian$english_score, col="red")
+qqnorm(non_frisian$english_score)
+qqline(non_frisian$english_score)
+boxplot(non_frisian$english_score, col="blue")
+shapiro.test(frisian$english_score)
+shapiro.test(non_frisian$english_score)
+t.test(frisian$english_score, non_frisian$english_score, mu=0, alt="two.sided", conf=0.95, var.eq=F, paired=F)
+cohen.d(frisian$english_score, non_frisian$english_score)
+```
+In this excercise will try to answer the following question:
+
+Is the English score of people who speak Frisian different from those who do not?
+
+We will look at the means of both the Frisian and non-Frisian speakers english_score. The Frisian speakers exists out of 20 students and the non-Frisian speakers out of 175 students from the university of Groningen who follow the Statistics 1 course at the faculty of Arts who filled in a questionnaire from which the data was extracted. We are going to look if there is a differnce between the English scores of the Frisian speakers and the non-Frisian speakers.
+
+$H_0$: The english score of Frisian speakers is the same as the english score of non-Frisian speakers.
+$H_a$: The english score of Frisian speakers is different from the english score of non-Frisian speakers.
+
+$H_0$: $\mu$fr = $\mu$non
+$H_a$: $\mu$fr $\neq$ $\mu$non
+
+$\alpha$ = 0.05
+
+We use a two sided sample independent t-test because we want to compare two independent samples without knowing the standard deviation and where the arguments are numerical. The qqplot determines that the distribution is close to normal and the Shapiro-Wilk test p-values are both above the significance level of 0.05 which means the samples do not deviate from normality.
+
+Results: 
+
+t = 1.9642
+df = 28.2
+p-value = 0.05943
+confidence interval = -0.02714119
+mean of the differences = -0.2102564
+cohen d estimate = 0.3572748 (small).
+
+
+The p-value is higher than the significance level of 0.05 and therefor we do not reject $H_0$.
+
+The effectsize is 0.3572748 (small). 
+
+Conlusion:
+
+There is no difference between the Frisian and the non-Frisian speakers when it comes to english_scores. Although I must say it was rather close to the significance level the effectsize also remains smalls. This means it couldn't be noticed with the naked eyes and therefor I must conclude that there isn't a significant difference between $H_0$ and $H_a$.
+
+
+#Excercise 7
+
+```{r, fig.width=5, fig.height=5}
+class(full$age_reading)
+class(full$age_speaking)
+(mean_ar <- mean(full$age_reading))
+(mean_as <- mean(full$age_speaking))
+qqnorm(full$age_reading)
+qqline(full$age_reading)
+boxplot(full$age_reading, col="red")
+qqnorm(full$age_speaking)
+qqline(full$age_speaking)
+boxplot(full$age_speaking, col="blue")
+shapiro.test(full$age_reading)
+shapiro.test(full$age_speaking)
+t.test(full$age_reading, full$age_speaking, mu=0, alt="less", conf=0.95, var.eq=F, paired=T)
+cohen.d(full$age_reading, full$age_speaking)
+```
+
+
+In this excercise will try to answer the following question:
+
+Is the average age when people learn how to read English lower than the average age when people learn how to speak English?
+
+
+We will look at the average age of reading English and the average age of learning how to speak English of one sample group. The sample exsists out of 195 students from the university of Groningen who follow the Statistics 1 course at the faculty of Arts who filled in a questionnaire from which the data was extracted. We are going to look if the the average age of reading English is lower than the average age of speaking English.
+
+$H_0$: The average age of reading English is the same as the average age of speaking English.
+$H_a$: The average age of reading English is lower than the average age of speaking English.
+
+$H_0$: $\mu$r = $\mu$s
+$H_a$: $\mu$r < $\mu$s
+
+$\alpha$ = 0.05
+
+We use a one sided paired sample t-test because we want to determine if one set of data is lower than the other set of data of the same sample without knowing the standard deviation and where the arguments are numerical and can be measured in ratio. The qqplot determines that the distribution is is not close to normal and the Shapiro-Wilk test p-values are both below the significance level of 0.05 which means the samples do deviate from normality but because the sample size is above 30 the paired sample t-test can still be used. 
+
+Results: 
+
+t = -1.8977
+df = 194
+p-value = 0.02961
+confidence interval = -0.02714119
+mean of the differences = -0.2102564
+cohens d estimate = -0.1114058 (negligible)
+
+
+The p-value is lower than the significance level of 0.05 and therefor we do reject $H_0$ and accept $H_a$.
+
+The effectsize is -0.1114058 (negligible) 
+
+Conlusion:
+
+The age of reading English is lower than the age of speaking English in this sample. Even the effectsize negligible. This means it couldn't be noticed with the naked eyes. Even though we must accept $H_a$ the effectsize isn't that high and could be disregarded.
+
+#Excercise 8
+
+```{r, fig.width=5, fig.height=5}
+class(full$handedness)
+class(full$gender)
+table(full$bl_edu)
+mono_edu <- full[full$bl_edu == "N",]
+(tbl <- table(mono_edu$hand, mono_edu$gender))
+round(chisq.test(tbl)$expected)
+barplot(tbl, legend = c("R", "L"), col = c("pink", "lightblue"))
+chisq.test(tbl, correct=FALSE)
+assocstats(tbl)
+chisq.test(tbl)$observed
+prop.table(tbl, 2)
+prop.table(tbl, 1)
+chisq.test(tbl)$stdres  # z-scored differences
+```
+
+
+In this excercise will try to answer the following question:
+
+Is there a relationship between handedness and gender for students who had monolingual education?
+
+
+We will look at the handedness(2 levels: L, R) and gender (2 levels: F, M) of students who had a monolingual education. The sample exsists out of 176 students from the university of Groningen who follow the Statistics 1 course at the faculty of Arts who filled in a questionnaire from which the data was extracted. We are going to look if handedness and the gender of the monolingual students are dependend.
+
+$H_0$: Handedness and gender for students with a monolinual education are independent.
+$H_a$: Handedness and gender for students with a monolingual education are dependent.
+
+
+$\alpha$ = 0.05
+
+
+The table shows their relation. As both variables are nominal, and the expected frequency of each combination was equal or greater than 5, we assessed the dependence of the two variables using the Chi Squared test.
+
+
+X-squared = 1.7665
+df = 1
+p-value = 0.1838  
+Cramer's V = 0.1
+
+The p-value is higher than the significance level of 0.05 and therefor we do not reject $H_0$.
+
+Conclusion:
+
+Handedness and gender of students who follow a monolingual education are independent from one another. The difference from the expected distribution was greatest for the Female group: there were many more lefthanded students than expected.  Cramers V states that the effectsize is small and therefor we can put aside the alternative hypothesis.
+
+# Excercise 9
+
+```{r, fig.width=5, fig.height=5}
+class(full$english_grade)
+table(full$spk_frisian)
+frisian <- full[full$spk_frisian == "Y",]
+non_frisian <- full[full$spk_frisian == "N",]
+mean(frisian$english_grade)
+mean(non_frisian$english_grade)
+qqnorm(frisian$english_grade)
+qqline(frisian$english_grade)
+boxplot(frisian$english_grade, col="red")
+qqnorm(non_frisian$english_grade)
+qqline(non_frisian$english_grade)
+boxplot(non_frisian$english_grade, col="blue")
+shapiro.test(frisian$english_grade)
+shapiro.test(non_frisian$english_grade)
+t.test(frisian$english_grade, non_frisian$english_grade, mu=0, alt="two.sided", conf=0.95, var.eq=F, paired=F)
+cohen.d(frisian$english_grade, non_frisian$english_grade)
+```
+In this excercise will try to answer the following question:
+
+Is the English grade of people who speak Frisian different from those who do not?
+
+We will look at the means of both the Frisian and non-Frisian speakers english_grade. The Frisian speakers exists out of 20 students and the non-Frisian speakers out of 175 students from the university of Groningen who follow the Statistics 1 course at the faculty of Arts who filled in a questionnaire from which the data was extracted. We are going to look if there is a differnce between the English grades of the Frisian speakers and the non-Frisian speakers.
+
+$H_0$: The english grade of Frisian speakers is the same as the english grade of non-Frisian speakers.
+$H_a$: The english grade of Frisian speakers is different from the english grade of non-Frisian speakers.
+
+$H_0$: $\mu$fr = $\mu$non
+$H_a$: $\mu$fr $\neq$ $\mu$non
+
+$\alpha$ = 0.05
+
+We use a two sided sample independent t-test because we want to compare two independent samples without knowing the standard deviation and where the arguments are numerical. The qqplot determines that the distribution is close to normal and the Shapiro-Wilk test p-values are both above the significance level of 0.05 which means the samples do not deviate from normality.
+
+Results: 
+
+t = 0.81531
+df = 22.597
+p-value = 0.4234
+confidence interval = -0.2809007  0.6457578
+mean of the differences = 7.375000  7.192571
+cohen d estimate = 0.2107175 (small)
+
+
+The p-value is higher than the significance level of 0.05 and therefor we do not reject $H_0$.
+
+The effectsize is 0.2107175 (small)
+
+Conlusion:
+
+There is no difference between the Frisian and the non-Frisian speakers when it comes to english_grade. Although I must say it was rather close to the significance level the effectsize also remains smalls. This means it couldn't be noticed with the naked eyes and therefor I must conclude that there isn't a significant difference between $H_0$ and $H_a$.
+
+# Exercise 10
+
+```{r, fig.width=5, fig.height=5}
+table(full$spk_frisian)
+boxplot(full[full$spk_frisian == "Y",]$english_score, full[full$spk_frisian == "N",]$english_score, names = c("Frisian","Non-Frisian"), col="red")
+qqnorm(full[full$spk_frisian == "Y",]$english_score, main = 'Frisian')
+qqline(full[full$spk_frisian == "Y",]$english_score)
+qqnorm(full[full$spk_frisian == "N",]$english_score, main = 'Non-Frisian')
+qqline(full[full$spk_frisian == "N",]$english_score)
+shapiro.test(full[full$spk_frisian == "Y",]$english_score)
+shapiro.test(full[full$spk_frisian == "N",]$english_score)
+wilcox.test(full[full$spk_frisian == "Y",]$english_score, full[full$spk_frisian == "N",]$english_score, alternative = "greater")
+cliff.delta(full[full$spk_frisian == "Y",]$english_score, full[full$spk_frisian == "N",]$english_score)
+```
+
+In this excercise will try to answer the following question:
+
+Is the English score of people who speak Frisian higher than those who do not?
+
+
+We will look at the English score to determine if it is higher for the Frisian speaking students than the English score of non-Frisian speaking students. The sample exsists out of 195 students from the university of Groningen who follow the Statistics 1 course at the faculty of Arts who filled in a questionnaire from which the data was extracted. 
+
+
+$H_0$: The English score of Frisian speaking students are the same as the English score of non-Frisian speaking students.
+$H_a$: The English score of Frisian speaking students are higher than the English score of non-Frisian speaking students.
+
+$H_0$: $\mu_y$ = $\mu_n$
+$H_a$: $\mu_y$ > $\mu_n$
+
+$\alpha$ = 0.05
+
+
+We use the Mann-Whitney U test because we use numerical data which can be measured in ratio, do not know the standard deviation, the groups are not normally distributed and one of the groups is below the sample minimum size of 30.
+
+
+p-value = 0.06317
+U-value = 2116
+delta estimate: 0.2091429 (small)
+
+
+The p-value is higher than the significance level of 0.05 and therefor we do not reject $H_0$.
+
+Conlusion:
+
+The p-value is below the significance level and the effectsize small. This means it bearly noticable with the naked eyes and therefor we do not reject $H_0$.

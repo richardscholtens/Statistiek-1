@@ -1,0 +1,109 @@
+---
+title: "Statistiek - Lab session 1"
+author: "J.F.P. (Richard) Scholtens (s2956586)"
+date: "Generated on: `r date()`"
+output: 
+  html_document:
+    toc: true
+    code_folding: show
+    toc_float: 
+        collapsed: false
+        smooth_scroll: true
+    number_sections: true
+---
+
+
+# Exercise 1
+
+```{r, fig.width=5, fig.height=5}
+download.file('http://www.let.rug.nl/wieling/Statistiek-I/dat.rda','dat.rda')
+load("dat.rda", verbose=T)
+str(dat)
+head(dat)
+```
+
+# Exercise 2 
+
+```{r, fig.width=5, fig.height=5}
+tgender <- table(dat$gender)
+tgender
+barplot(tgender, main="Distribution gender", col=rainbow(2), ylim=c(0,250))
+
+
+tbl_edu <- table(dat$bl_edu)
+tbl_edu
+barplot(tbl_edu, main="Distribution bilingual education", col=rainbow(2), ylim=c(0,300))
+
+
+thand <- table(dat$hand)
+thand
+barplot(thand, main="Distribution handedness", col=rainbow(2), ylim=c(0,300))
+
+
+tstudy <- table(dat$study)
+tstudy
+barplot(tstudy, main="Distribution study", col=rainbow(2), ylim=c(0,120))
+```
+
+# Excercise 3
+
+```{r, fig.width=5, fig.height=5}
+table(round(dat$english_score, 1))
+```
+
+# Excercise 4
+
+```{r, fig.width=10, fig.height=5}
+par(mfrow=c(1,2))
+hist(dat$english_score, main="English Score", col=rainbow(12), xlab="Scores")
+hist(dat$english_grade, main="English Grade", col=rainbow(10), xlab="Grades", xlim=c(4,10), ylim=c(0, 140))
+```
+
+# Excercise 5
+```{r, fig.width=5, fig.height=5}
+hist(dat$english_score, main="English Score", col=rainbow(12), xlab="Scores", breaks=seq(0,10,1), ylim=c(0,140))
+```
+
+# Excercise 6
+```{r, fig.width=5, fig.height=5}
+plot(density(dat$english_score), main="Density plot English Scores", xlab="English scores", col="red")
+```
+
+
+# Excercise 7
+
+```{r, fig.width=5, fig.height=5}
+qqnorm(dat$english_score)
+qqline(dat$english_score, col="red")
+```
+
+The distribution is normal for english scores.
+
+# Excercise 8
+
+```{r, fig.width=5, fig.height=5}
+boxplot(dat$english_score, col="red")
+```
+
+# Excercise 9
+
+```{r, fig.width=5, fig.height=5}
+mean(round(dat$english_score))
+median(round(dat$english_score))
+my_mode <- function(x) {
+    counts <- table(x)
+    names(which(counts == max(counts)))
+}
+my_mode(round(dat$english_score))
+
+```
+
+
+# Excercise 10
+
+```{r, fig.width=5, fig.height=5}
+range(dat$english_score)
+IQR(dat$english_score)
+sd(dat$english_score)
+var(dat$english_score)
+```

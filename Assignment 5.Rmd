@@ -1,0 +1,329 @@
+---
+title: "Statistiek - Lab session 5"
+author: "J.F.P. (Richard) (s2956586)"
+date: "Generated on: `r date()`"
+output: 
+  html_document:
+    toc: true
+    code_folding: show
+    toc_float: 
+        collapsed: false
+        smooth_scroll: true
+    number_sections: true
+---
+Beste heer/mevrouw, 
+
+In de studiehandleiding staat het volgende vermeld: 
+
+Wanneer de voorbereidende online vragenlijst tenminste 1 maand voor het eerste
+hoorcollege volledig is ingevuld, kan éénmalig een te laat ingeleverd verslag (welke
+wel is ingeleverd binnen een week na de deadline) nog steeds 2 punten krijgen bij
+een goede beoordeling en 1 punt bij een voldoende beoordeling. Wanneer een
+student van deze mogelijkheid gebruik wil maken, dient dit in het verslag
+aangegeven te worden. Het invullen van de online vragenlijst geeft dus eenmalig
+extra tijd voor een practicum.
+
+
+Graag wil ik gebruik maken van deze optie. Vanwege de griep was ik niet in staat
+de opdrachten af te krijgen. Nu wil ik ze alsnog in leveren onder bovenstaande
+richtlijnen. 
+
+Met vriendelijke groet,
+
+J.F.P. (Richard) Scholtens
+s2956586
+
+
+```{r, fig.width=5, fig.height=5}
+download.file('http://www.let.rug.nl/wieling/Statistiek-I/dat.rda','dat.rda')
+load('dat.rda',verbose=T) # load population data
+
+set.seed(74)
+
+# Subset data to 16 people without bilingual education (random selection)
+bl_no <- dat[dat$participant %in% sample(dat[dat$bl_edu=='N',]$participant,16),] 
+
+# Subset data to 16 people with bilingual education (random selection)
+bl_yes <- dat[dat$participant %in% sample(dat[dat$bl_edu=='Y',]$participant,16),] 
+
+# create a new dataframe by combining the two subsets
+smp <- rbind(bl_no, bl_yes) 
+str(smp)
+```
+
+
+# Exercise 1
+
+```{r, fig.width=5, fig.height=5}
+table(smp$bl_edu)
+smp_bl_y <- smp[smp$bl_edu == "Y", ]
+smp_bl_n <- smp[smp$bl_edu == "N", ]
+boxplot(smp_bl_y$english_grade, main="English grade sample bilingual", col="blue")
+boxplot(smp_bl_n$english_grade, main="English grade sample not bilingual", col="red")
+
+qqnorm(smp_bl_y$english_grade)
+qqline(smp_bl_y$english_grade)
+
+qqnorm(smp_bl_n$english_grade)
+qqline(smp_bl_n$english_grade)
+
+shapiro.test(smp_bl_y$english_grade)
+shapiro.test(smp_bl_n$english_grade)
+
+wilcox.test(smp_bl_y$english_grade, smp_bl_n$english_grade, alternative = "greater")
+
+library(effsize)
+cliff.delta(smp_bl_y$english_grade, smp_bl_n$english_grade)
+```
+
+We obtained English scores in a sample of 316 students of the Statistiek 1 course via an online questionnaire(222F, 93M). From those
+groups we got a sample from 32 random students. 16 of those students are bilingual and 16 are not.
+
+H0: The english grades of bilingual students are not significantly higher than those of non bilangual students.
+Ha: The english grades of bilingual students are significantly higher than those of non bilangual students.
+
+H0: $\mu$bl_y = $\mu$bl_n
+
+Ha: $\mu$bl_y > $\mu$bl_n
+
+Significance level: = 0.05
+
+The shapiro test concludes that the p-values are below the significance level of 0.05 so the samples deviate from normality. Because the samples are not normally distributed we use the Mann-Whitney U test to analyze the difference between the two groups.
+
+
+W/U= 172
+p = 0.03899
+
+The p-level is lower than the significance level. Therefor H0 will be rejected, and Ha will be accepted.
+
+The cliff delta test has been used to asses the effectsize of the non parametric test. It says the effectsize is medium
+spread so we must take in account these results.
+
+Conclusion:
+
+We must accept the alternative statement and take the results seriously. This means the bilangual students could be significantly better in the English language than students who do not study bilingual.
+
+
+# Exercise 2
+
+```{r, fig.width=5, fig.height=5}
+wilcox.test(smp_bl_y$english_grade, smp_bl_n$english_grade)
+cliff.delta(smp_bl_y$english_grade, smp_bl_n$english_grade)
+```
+
+
+We obtained English scores in a sample of 316 students of the Statistiek 1 course via an online questionnaire(222F, 93M). From those
+groups we got a sample from 32 random students. 16 of those students are bilingual and 16 are not.
+
+H0: The english grades of bilingual students are not significantly different than those of non bilangual students.
+Ha: The english grades of bilingual students are significantly different than those of non bilangual students.
+
+H0: $\mu$bl_y = $\mu$bl_n
+
+Ha: $\mu$bl_y $\neq$ $\mu$bl_n
+
+Significance level: = 0.05
+
+
+The shapiro test concludes that the p-values are below the significance level of 0.05 so the samples deviate from normality. Because the samples are not normally distributed we use the Mann-Whitney U test to analyze the difference between the two groups.
+
+
+W/U= 172
+p = 0.07799
+
+The p-level is higher than the significance level. Therefor H0 will not be rejected
+
+The cliff delta test has been used to asses the effectsize of the non parametric test. It says the effectsize is medium
+spread so we must take in account these results.
+
+Conclusion:
+
+We do not reject the HO statement. This means the bilangual students grades are not significantly different
+in the English language than students who do not study bilingual.
+
+
+
+# Exercise 3
+
+```{r, fig.width=5, fig.height=5}
+smp_n_eg <- smp[smp$bl_edu=='N',]$english_grade
+m_bl_n <- mean(smp_n_eg)
+zdat <- rnorm(mean=m_bl_n, n=16)
+plot(density(zdat))
+
+
+boxplot(smp_n_eg, main="English Score monolingual", col="red")
+abline(h=7.5)
+
+wilcox.test(dat$english_score, alternative = "two.sided", mu = 7.5)
+pval <- wilcox.test(dat$english_score, alternative = "two.sided", mu = 7.5)$p.value
+zval <- qnorm(pval/2, lower.tail = FALSE)  # pval/2 because of two-tailed test
+n <- nrow(dat)
+(effectsize <- zval/sqrt(n))
+
+```
+
+
+We obtained English scores in a sample of 316 students of the Statistiek 1 course via an online questionnaire(222F, 93M). From those
+groups we got a sample from 32 random students. 16 of those students are bilingual and 16 are not. We use the Wilcox signed rank-test because the because the density plot is roughly symmetric and we use the same subjects.
+
+H0: The english grades of monolingual students are not significantly different than 7.5.
+Ha: The english grades of monolingual students are significantly different 7.5.
+
+
+H0: $\mu$ = 7.5
+
+Ha: $\mu$ $\neq$ 7.5
+
+Significance level: = 0.05
+
+V = 21424
+p = 0.03243
+
+The p-level is lower than the significance level. Therefor H0 will be rejected, and Ha will be accepted.
+
+The effect size is 0.1205246 wich means it is worth looking at.
+
+Conclusion:
+
+We reject the HO statement. This means the monolangual students english grades are significantly different
+from 7.5.
+
+# Exercise 4
+
+```{r, fig.width=5, fig.height=5}
+smp_y_eg <- smp[smp$bl_edu=='Y',]$english_grade
+m_bl_y <- mean(smp_y_eg)
+zdat <- rnorm(mean=m_bl_y, n=16)
+plot(density(zdat))
+
+
+boxplot(smp_y_eg, main="English Score bilingual", col="blue")
+abline(h=7.5)
+
+signs <- sign(bl_yes$english_grade - 7.5)
+
+plus_sign <- sum(signs ==1)
+plus_sign
+
+min_sign <- sum(signs ==-1)
+min_sign
+
+max_sign <- sum(plus_sign + min_sign)
+max_sign
+
+binom.test(x = min_sign, n = max_sign, p = 0.5, alternative = "two.sided")
+
+pval3 <- binom.test(x = min_sign, n = max_sign, p = 0.5, alternative = "two.sided")$p.value
+zval3 <- qnorm(pval3/2, lower.tail = FALSE)  # pval/2 because of two-tailed test
+n <- nrow(dat)
+(effectsize <- zval3/sqrt(n))
+
+```
+
+
+We obtained English scores in a sample of 316 students of the Statistiek 1 course via an online questionnaire(222F, 93M). From those
+groups we got a sample from 32 random students. 16 of those students are bilingual and 16 are not. We use the sign-test because the because the density plot isn't symmetric.
+
+H0: The english grades of bilingual students are not significantly different than 7.5.
+Ha: The english grades of bilingual students are significantly different 7.5.
+
+
+H0: $\mu$ = 7.5
+
+Ha: $\mu$ $\neq$ 7.5
+
+Significance level: = 0.05
+
+p = 0.8036
+
+The p-level is higher than the significance level. Therefor H0 will not be rejected.
+
+The effect size is 0.01401072 wich means it isn't worth looking at.
+
+Conclusion:
+
+We do not reject the HO statement. This means the bilangual students english grades are not significantly different
+than 7.5.
+
+# Exercise 5
+
+```{r, fig.width=5, fig.height=5}
+age_write <- smp$age_writing
+
+age_speak <- smp$age_speaking
+
+m_age_wr <- mean(age_write)
+m_age_sp <- mean(age_speak)
+
+
+zdat <- rnorm(mean=m_age_wr, n=32)
+plot(density(zdat))
+
+zdat <- rnorm(mean=m_age_sp, n=32)
+plot(density(zdat))
+
+wilcox.test(age_write, age_speak, alternative = "two.sided")
+cliff.delta(age_write, age_speak)
+
+
+```
+
+We obtained English scores in a sample of 316 students of the Statistiek 1 course via an online questionnaire(222F, 93M). From those
+groups we got a sample from 32 random students. 16 of those students are bilingual and 16 are not. We use the Wilcox signed rank-test because the because the density plots are roughly symmetric and we use the same subjects.
+
+H0: The age of writing of english is not significantly different than the age of speaking english.
+Ha: The age of writing of english is significantly higher than the age of speaking english.
+
+
+H0: $\mu$wr = $\mu$sp
+
+Ha: $\mu$wr > $\mu$sp
+
+Significance level: = 0.05
+
+W / U = 567
+p = 0.4445
+
+The p-level is higher than the significance level. Therefor H0 will not be rejected.
+
+The effect size is 0.1074219 wich means it isn't worth looking at.
+
+Conclusion:
+
+We do not reject the HO statement. This mean the age of writing english isn't significantly higher than the age of speaking english.
+
+# Exercise 6
+
+```{r, fig.width=5, fig.height=5}
+
+t.test(age_speak, age_write, alternative = "greater", paired = TRUE)
+cohen.d(age_speak, age_write, paired = TRUE)
+
+```
+We obtained English scores in a sample of 316 students of the Statistiek 1 course via an online questionnaire(222F, 93M). From those
+groups we got a sample from 32 random students. 16 of those students are bilingual and 16 are not. We use the t-test because the data is symmetric.
+
+H0: The age of writing of english is not significantly different than the age of speaking english.
+Ha: The age of writing of english is significantly higher than the age of speaking english.
+
+
+H0: $\mu$wr = $\mu$sp
+
+Ha: $\mu$wr > $\mu$sp
+
+This hypothesis is tested with a paired T-test.
+Significance level: 0.05:
+p = 0.9805
+
+The p-level is higher than the significance level. Therefor we do not reject H0.
+
+Cohen's d estimate: -0.38112 (small)
+
+Significance level: 0.05: 
+
+The effectsize is small and therefor not important.
+
+Conclusion:
+
+We do not reject the HO statement. This mean the age of writing english isn't significantly higher than the age of speaking english. When comparing the data with the test in the previous excercise you'll see there is no significant change in the outcome.

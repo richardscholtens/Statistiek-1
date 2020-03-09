@@ -1,0 +1,208 @@
+---
+title: "Statistiek - Lab session 4"
+author: "J.F.P. (Richard) (s2956586)"
+date: "Generated on: `r date()`"
+output: 
+  html_document:
+    toc: true
+    code_folding: show
+    toc_float: 
+        collapsed: false
+        smooth_scroll: true
+    number_sections: true
+---
+
+# Exercise 1
+
+```{r, fig.width=5, fig.height=5}
+download.file('http://www.let.rug.nl/wieling/Statistiek-I/dat.rda','dat.rda')
+load('dat.rda',verbose=T)
+
+str(dat)
+set.seed(111)
+qqnorm(dat$english_score, col="blue")
+qqline(dat$english_score, col="red")
+boxplot(dat$english_score, main="English Score Data", col="red")
+abline(h=7.5)
+t.test(dat$english_score, alternative = "less", mu= 7.5 )
+```
+
+The QQ-plot shows that the distribution is normal.
+The boxplot shows that most scores are lower then 7.5.
+When we run the one sided t test we see that the sample mean lies higher than the actual mean.
+The population is in this case a set of bachelor students who follow the course Statistiek 1.
+The hypothesis was tested by a online questionairre by these same students by supplying a speech sample.
+
+t(314) = -2.39, p =0.009
+
+H0: $\mu$d = $\mu$t and Ha: $\mu$d < $\mu$t
+
+We obtained English scores in a sample of 315 students of the Statistiek 1 course via an online questionnaire. 
+
+There are 315 samples obtained through the students. Therefor there are more than 30 values and normally distributed which means the t-test could be used. 
+
+Mean of the english: 7.347 
+Significance level: 0.05
+t(314) = -2.39 
+p = 0.009 
+
+The alternative hypothesis can be accepted. This means that the average english_score of the students is lower than 7.5
+
+
+# Exercise 2
+
+```{r, fig.width=5, fig.height=5}
+t.test(dat$english_score, alternative = "two.sided", mu= 7.5 )
+```
+
+H0: ??d = ??t and Ha: ??d ??? ??t
+This hypothesis is tested with a two-sided T-test
+Significance level: = 0.05
+t(314) = -2.39
+p = 0.017
+
+The results are significant because the p-level is below the significance level. Therefor H0 is rejected and we accept Ha.
+
+H0: $\mu$d = $\mu$t
+Ha: $\mu$d $\neq$ $\mu$t 
+
+
+# Exercise 3
+
+```{r, fig.width=5, fig.height=5}
+table(dat$gender)
+datF <- dat[dat$gender == "F", ]
+datM <- dat[dat$gender == "M", ]
+mean(datF$english_score)
+mean(datM$english_score)
+qqnorm(datF$english_score)
+qqline(datF$english_score)
+boxplot(datF$english_score)
+qqnorm(datM$english_score)
+qqline(datM$english_score)
+boxplot(datM$english_score, col="red")
+t.test(datF$english_score, datM$english_score)
+library(effsize)
+cohen.d(datF$english_score, datM$english_score)
+```
+We obtained English scores in a sample of 315 students of the Statistiek 1 course via an online questionnaire(222F, 93M). 
+
+H0: $\mu$F = $\mu$M 
+Ha: $\mu$F $\neq$ $\mu$M
+This hypothesis is tested with a two-sided T-test
+Significance level: = 0.05
+p = 0.0004
+
+The p-level is below the significance level. Therefor we must reject H0 and accept Ha.
+
+Cohen's d: -0.4358338 (small) 
+Mean english_score females: 7.203624
+Mean english_score males 7.689283. 
+Significance level: 0.05:
+
+The effectsize is small, so it isn't worth mentioning. 
+
+# Exercise 4
+
+```{r, fig.width=5, fig.height=5}
+table(dat$study)
+datC <- dat[dat$study == "CIS", ]
+datL <- dat[dat$study == "LING", ]
+mean(datC$english_score)
+mean(datL$english_score)
+qqnorm(datC$english_score)
+qqline(datC$english_score)
+boxplot(datC$english_score, col="red")
+qqnorm(datL$english_score)
+qqline(datL$english_score)
+boxplot(datL$english_score, col="red")
+t.test(datC$english_score, datL$english_score)
+cohen.d(datC$english_score,datL$english_score)
+```
+
+H0: English scores from CIS students are higher than Ling students. 
+Ha: English scores from CIS students are not higher than Ling students. 
+
+H0: $\mu$C = $\mu$L 
+Ha: $\mu$C $\neq$ $\mu$L
+This hypothesis is tested with a two-sided T-test
+Significance level: 0.05
+t(199) = 0.49
+p = 0.63
+
+The p-level is higher than the significance level. Therefor H0 will not be rejected.
+
+Cohen's d estimate: 0.06816897 (negligible) 
+Mean english_score CIS: 7.177996
+Mean english_score LING 7.106976. 
+Significance level: 0.05
+
+The effectsize is negligible and there for there isn't much effect.
+
+# Exercise 5
+
+```{r, fig.width=5, fig.height=5}
+datM <- dat[dat$gender == "M", ]
+mean(datM$english_grade)
+mean(datM$english_score)
+qqnorm(datM$english_score-datM$english_grade)
+qqline(datM$english_score-datM$english_grade)
+boxplot(datM$english_score-datM$english_grade, col="red")
+t.test(datM$english_score, datM$english_grade, alternative = "greater", paired = TRUE)
+cohen.d(datM$english_score, datM$english_grade, paired = T)
+```
+H0: English scores of men are significantly equal to their English grades.
+Ha: English scores of men are significantly higher than the English grades.
+
+we are interested in assessing if for 
+H0: $\mu$S = $\mu$G 
+Ha: $\mu$S > $\mu$G
+This hypothesis is tested with a one-sided T-test.
+Significance level: 0.05:
+p = 0.2478
+
+The p-level is higher than the significance level. Therefor we do not reject H0.
+
+Cohen's d estimate: 0.07092706 (negligible)
+Mean english_grade: 7.635484
+Mean LING students english_grade: 7.689283. 
+Significance level: 0.05: 
+
+The effectsize is neglible and therefor not important.
+
+# Exercise 6
+
+```{r, fig.width=5, fig.height=5}
+datM <- dat[dat$gender == "M", ]
+dat17 <- datM[datM$year == "2017", ]
+mean(dat17$english_grade)
+mean(dat17$english_score)
+qqnorm(dat17$english_score-dat17$english_grade)
+qqline(dat17$english_score-dat17$english_grade)
+boxplot(dat17$english_score-dat17$english_grade, col="red")
+t.test(dat17$english_score, dat17$english_grade, alternative = "greater", paired = TRUE)
+cohen.d(dat17$english_score, dat17$english_grade, paired = TRUE)
+```
+H0: The English scores of men with the academic year of 2017 are equal than their English grades.
+Ha: The English scores of men with the academic year of 2017 are significantly higher than their English grades.
+
+H0: $\mu$S = $\mu$G 
+Ha: $\mu$S > $\mu$G
+
+This hypothesis is tested with a paired T-test.
+Significance level: 0.05:
+p = 0.04646
+
+The p-level is lower than the significance level. Therefor we must reject H0 and accept Ha.
+
+Cohen's d estimate: 0.07092706 (negligible)
+Mean english_grade: 7.635484
+Mean LING students english_grade: 7.689283. 
+Significance level: 0.05: 
+
+Cohen's d estimate: 0.283753 (small) 
+Mean english_grade: 7.713514
+Mean english_score: 7.895873. 
+Significance level: 0.05: 
+
+The effectsize is small and therefor not important.

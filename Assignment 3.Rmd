@@ -1,0 +1,208 @@
+---
+title: "Statistiek I - Lab session X"
+author: "J.F.P. (Richard) Scholtens (s2956586)"
+date: "Generated on: `r date()`"
+output: 
+  html_document:
+    toc: true
+    code_folding: show
+    toc_float: 
+        collapsed: false
+        smooth_scroll: true
+    number_sections: true
+---
+
+# Exercise 1
+
+```{r, fig.width=5, fig.height=5}
+download.file('http://www.let.rug.nl/wieling/Statistiek-I/dat.rda','dat.rda')
+load('dat.rda',verbose=T)
+
+str(dat)
+
+dmgrade <- dat$english_grade - mean(dat$english_grade)
+
+admgrade <- abs(dat$english_grade)
+admgrade <- abs(dat$english_grade - mean(dat$english_grade))
+
+dat$dmgrade <- NULL
+
+mean(admgrade)
+sd(dat$english_grade)
+```
+
+# Exercise 2 
+
+```{r, fig.width=5, fig.height=5}
+dat$english8 = "Yes"
+dat[dat$english_grade < 8,]$english8 <- "No"
+dat$english8 <- as.factor(dat$english8)
+barplot(table(dat$english8), col=rainbow(2), main="English grade higher or lower than 8.", ylim=c(0,200))
+```
+
+# Excercise 3
+
+```{r, fig.width=5, fig.height=5}
+dat2 <- dat[dat$english8 == "Yes",]
+save(dat2, file='dat2.rda')
+str(dat2)
+```
+
+# Excercise 4
+
+```{r, fig.width=5, fig.height=5}
+set.seed(111)
+zdat <- rnorm(mean=0, sd=1, n=100)
+plot(density(zdat))
+qqnorm(zdat)
+qqline(zdat)
+```
+
+# Excercise 5
+
+```{r, fig.width=10, fig.height=5}
+set.seed(111)
+zdat2 <- rnorm(mean=0, sd=1, n=1000000)
+plot(density(zdat2))
+plotNormal <- function(mean=0, sd=1) { 
+    curve( dnorm(x,mean,sd), xlim=c(mean-4*sd,mean+4*sd) )
+}
+plotNormal()
+```
+
+# Excercise 6
+
+```{r, fig.width=10, fig.height=5}
+plotNormal <- function(mean=0, sd=1, shademin=NA, shademax=NA, twotailed=F, shadecol='red') { 
+    # plots normal distribution
+    curve(dnorm(x,mean,sd),xlim=c(mean-4*sd,mean+4*sd),xlab='',ylab='',xaxt='n')
+
+    if (!(is.na(shademin) & is.na(shademax))) { # if shademin and/or shademax are set
+        # draw shaded area
+        if (is.na(shademin)) { shademin <- mean - 4*sd } # shademin if not set is left side of plot
+        if (is.na(shademax)) { shademax <- mean + 4*sd } # shademax if not set is right side of plot
+        polygon(c(shademin,seq(shademin,shademax,0.01),shademax), 
+                c(0,dnorm(seq(shademin,shademax,0.01),mean,sd),0),col=shadecol, border=shadecol) # draw area
+    }
+
+    # x-axis labels and vertical lines at sd's
+    axis(1, at=seq(mean-3*sd,mean+3*sd,by=sd), cex.axis=1.3, labels=round(seq(mean-3*sd,mean+3*sd,by=sd),1))
+    for (i in c(-3,-2,-1,0,1,2,3)) { 
+       segments(mean+i*sd,par("usr")[3],mean+i*sd,dnorm(mean=mean,sd=sd,mean+sd*i), 
+                lty=ifelse(i==0,1,3),col='gray')
+    }
+}
+
+plotNormal(mean=100, sd=15, shademin=115)
+z <- (115-100)/15
+pnorm(z, lower.tail=F)
+pnorm(115, mean=100, sd=15, lower.tail=F)
+
+```
+
+# Excercise 7
+
+```{r, fig.width=10, fig.height=5}
+se <- 15/sqrt(25)
+105 - se*2
+105 + se*2
+105 - (2.6*se)
+105 + (2.6*se)
+```
+
+With a 95% certainty we can state that the data from the IQ lies between 99 and 111. From the normal distribution the left and right borders has been calculated. This means we take the dat from 2.5 % to 97.5%
+
+With a 99% certainty we can state that the data from the IQ lies between 97.2 and 112.8. The left and right border from the normal distribution has been calculated above. This means we take the dat from 0.5 % to 99.5%
+
+# Excercise 8
+
+Null-hypothesis: "People in Groningen have a IQ of 100."
+Alternative-hypothesis: "People in Groningen have a IQ higher than 100."
+H0: mu = 100 Ha: m > 100
+
+I will use a one-sided z-test because I only want to know if it is higher (right side) and not lower (left side).
+I'll use the standard error for comparing a sample to the population. If I wanted to know an individual score compared to the population, I would use the standard deviation. 
+
+
+```{r, fig.width=10, fig.height=5}
+mu <- 100
+m <- 105
+sd <- 15
+sample_pop <- 25
+se <- sd/ sqrt(sample_pop)
+zscore <- (m - mu)/se
+pval <- pnorm(zscore, lower.tail=F)
+pval
+```
+
+P (z score) < 0,05 and so H0 can be put aside and the alternative hypothesis can be acknowledged. The difference between the means of the IQ are significant.
+
+The smaller the sample group is the higher the standard-error becomes. The effect size is relative to the standard error because that determines how much error there is in a sample. The lower the sample, the higher the standard error and therefor the higher the effect size.
+
+```{r, fig.width=10, fig.height=5}
+download.file('http://www.let.rug.nl/wieling/Statistiek-I/zvis.R','zvis.R') # downloads file
+source('zvis.R') # loads function, so you can use it in R
+zvis(m, mu, sd, sample_pop, "right", alpha = 0.05)
+effectsize <- (m-mu)/sd
+effectsize
+```
+
+The test statistic 0.04779035 is not greater than the critical value of 1.6449. Hence, at .05 significance level, we do not reject the null hypothesis that people in Groningen have a IQ of 100.
+
+# Exercise 9
+Null-hypothesis: "People in Groningen have a IQ of 100."
+Alternative-hypothesis: "People in Groningen have a IQ higher or lower than 100."
+
+H0: mu is 100 Ha: m is not 100
+
+This is a two sided test because it looks at both sides. It checks if it is smaller or the greater than 100.
+
+```{r, fig.width=10, fig.height=5}
+pval <- pnorm(zscore, lower.tail=FALSE)  # upper tail 
+p <- pval*2 # two???tailed p???value 
+p
+effectsize
+
+```
+The p-value is 0.0955807. Hence, at .05 significance level, we do not reject the null hypothesis that people in have a IQ of 100.
+
+```{r, fig.width=10, fig.height=5}
+zvis(m, mu, se, sample_pop, "twotailed", alpha = 0.05)
+
+```
+
+# Exercise 10
+Null-hypothesis: "People in Groningen speak in a same Dutch proficiency as the general Dutch population."
+Alternative-hypothesis: "People in Groningen speak in a worse Dutch proficiency as the general Dutch population."
+
+H0: mu = 7 H1: mu < 7 
+
+This a one sided test because it has been determined that output of the sample has a lower score than the population mean. This means we will look at the mean on the left side. 
+
+
+```{r, fig.width=10, fig.height=5}
+mu <- 7
+sd <- 2
+m <- 6.5
+sample_pop <- 64
+se <- sd/ sqrt(sample_pop)
+
+z <- (mu - m)/se
+z
+
+pval <- pnorm(z, lower.tail = T)
+pval
+
+
+zvis (m, mu, se, sample_pop, "left", alpha = 0.05)
+```
+The p-value is  0.9772499.  Hence, at .05 significance level, we do not reject the null hypothesis that people in Groningen speak in a same Dutch proficiency as the general Dutch population.
+
+# Exercise 11
+
+```{r, fig.width=10, fig.height=5}
+pnorm(z, lower.tail = T)
+zvis (m, mu, se, sample_pop, "left", alpha= 0.01)
+effectsize
+```
+P > 0,01 so H0 can't be put aside and the difference isn't significant.

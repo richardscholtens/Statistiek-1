@@ -1,0 +1,244 @@
+---
+title: "Statistiek - Lab session 5"
+author: "J.F.P. (Richard) (s2956586)"
+date: "Generated on: `r date()`"
+output: 
+  html_document:
+    toc: true
+    code_folding: show
+    toc_float: 
+        collapsed: false
+        smooth_scroll: true
+    number_sections: true
+---
+
+
+```{r, fig.width=5, fig.height=5}
+download.file('http://www.let.rug.nl/wieling/Statistiek-I/satsfull.rda','sats.rda')
+load('sats.rda',verbose=T)
+```
+
+#Excercise 1
+
+```{r, fig.width=5, fig.height=5}
+str(sats)
+head(sats)
+plot(density(sats$stats_grade))
+plot(density(sats$stats_choice))
+sats$math_grade = rowMeans(sats[,c('WA_grade','WB_grade','WC_grade','WD_grade')],na.rm=T)
+head(sats)
+```
+
+
+#Excercise 2
+
+```{r, fig.width=5, fig.height=5}
+library(vcd)  # install with: install.packages('vcd')
+
+(counts <- table(sats$instrument, sats$study))
+(expected <- round(chisq.test(counts)$expected))
+(rowtable <- prop.table(counts,1))
+(column <- prop.table(counts,2))
+(total <- prop.table(counts))
+(residuals <- chisq.test(sats$instrument, sats$study)$stdres)
+chisq.test(sats$instrument, sats$study)
+assocstats(counts)
+barplot(counts, col=rainbow(2))
+barplot(counts, legend = c("Y", "N"), beside = T, ylim = c(0, 380), main = "Beside",col=rainbow(2))
+```
+
+We use a dataset wherein 315 students from the studies LING, CIS, IS etc. gave answers to the statistic questions. In this excercise we will try to see if there is a relationship between playing an instrument and the study. We use the chi square test to test the dependence of the two variables because both variables are nominal and the frequency of every combination is above 5.
+
+H0: There is no significant relationship between playing instruments and the students chosen study.
+Ha: There is a significant relationship between playing instruments and the students chosen study.
+
+H0: $\mu$i = $\mu$s
+
+Ha: $\mu$i $\neq$ $\mu$s
+
+Significance level: 0.05
+
+
+$\chi^2$: 9.1545
+df: 3
+p-value: 0.02731
+Contingency Coeff.: 0.168 
+Cramer's V : 0.17
+
+The p-level is lower than the significance level. Therefor H0 will be rejected and we accept Ha.
+
+
+#Excercise 3
+
+```{r, fig.width=5, fig.height=5}
+sats17 <- sats[sats$year == "2017", ]
+(counts <- table(sats17$edu_level, sats17$study))
+(expected <- round(chisq.test(counts)$expected))
+(rowtable <- prop.table(counts,1))
+(column <- prop.table(counts,2))
+(total <- prop.table(counts))
+fisher.test(counts)
+assocstats(counts)
+barplot(counts, col=rainbow(3))
+barplot(counts, legend = c("Y", "N"), beside = T, ylim = c(0, 380), main = "Beside",col=rainbow(3))
+```
+
+
+We use a dataset wherein 315 students from the studies LING, CIS, IS etc. gave answers to the statistic questions. In this excercise we will try to see if there is a relationship between education level and the study of the 2017 group. The frequency of the combination is below 5. This is why we use Fisher's exact test.
+
+H0: There is no significant relationship between education level and the students chosen study.
+Ha: There is a significant relationship between education level and the students chosen study.
+
+H0: $\mu$e = $\mu$s
+
+Ha: $\mu$e $\neq$ $\mu$s
+
+Significance level: 0.05
+
+p-value: 2.608e-10
+
+Cramer's V : 0.485
+
+The p-level is lower than the significance level. Therefor H0 will be rejected and we accept Ha.
+
+The effectsize is rather big.
+
+
+#Excercise 4
+
+```{r, fig.width=5, fig.height=5}
+sats16 <- sats[sats$year == "2016", ]
+satsQ <- c("Q5", "Q11", "Q26", "Q31", "Q32", "Q35", "math_grade")
+satsQ2 <- c("Q5", "Q11", "Q26", "Q31", "Q32", "Q35")
+satsCC <- sats16[satsQ]
+satsCC_nomath <- sats16[satsQ2]
+cor(satsCC$Q5, satsCC$math_grade, use = "pairwise.complete.obs")
+plot(satsCC$Q5,satsCC$math_grade)
+abline(lm(satsCC$math_grade ~ satsCC$Q5))
+cor(satsCC$Q11, satsCC$math_grade, use = "pairwise.complete.obs")
+plot(satsCC$Q11,satsCC$math_grade)
+abline(lm(satsCC$math_grade ~ satsCC$Q11))
+cor(satsCC$Q26, satsCC$math_grade, use = "pairwise.complete.obs")
+plot(satsCC$Q26,satsCC$math_grade)
+abline(lm(satsCC$math_grade ~ satsCC$Q26))
+cor(satsCC$Q31, satsCC$math_grade, use = "pairwise.complete.obs")
+plot(satsCC$Q31,satsCC$math_grade)
+abline(lm(satsCC$math_grade ~ satsCC$Q31))
+cor(satsCC$Q32, satsCC$math_grade, use = "pairwise.complete.obs")
+plot(satsCC$Q32,satsCC$math_grade)
+abline(lm(satsCC$math_grade ~ satsCC$Q32))
+cor(satsCC$Q35, satsCC$math_grade, use = "pairwise.complete.obs")
+plot(satsCC$Q35,satsCC$math_grade)
+abline(lm(satsCC$math_grade ~ satsCC$Q35))
+```
+
+There is a negative relation with math_grade between the questions: "5, 11, 26, 35". They are also inverted. This can bee seen back by looking at the sign in front of the questions and by looking at the questions themselfs in the sat test. There is a document which explains these questions.
+
+
+#Excercise 5
+
+```{r, fig.width=5, fig.height=5}
+library(psych)
+(result <- alpha(satsCC))
+(summary(result))
+(summary(alpha(satsCC, keys=c(-1,-1,-1,1,1,-1,1))))
+inversed <- alpha(satsCC_nomath, keys=c(-1,-1,-1,1,1,-1))
+(summary(inversed))
+sats$satscomp <- ((8-sats$Q5)+(8-sats$Q11)+(8-sats$Q26)+sats$Q31+sats$Q32+(8-sats$Q35))/6
+mean((sats$satscomp))
+cor(sats$satscomp, sats$math_grade, use = "pairwise.complete.obs")
+plot(sats$satscomp, sats$math_grade)
+abline(lm(sats$math_grade ~ sats$satscomp))
+```
+
+
+Without inverse results:
+
+Reliability analysis
+raw_alpha: 0.18
+std.alpha: -0.13
+G6(smc): 0.36
+average_r: -0.016
+S/N: -0.11
+ase: 0.077
+mean: 4.7
+sd: 0.53
+
+There is a negative relation with math_grade between the questions: "5, 11, 26, 35". They are also inverted. This can bee seen back by looking at the sign in front of the questions and by looking at the questions themselfs in the sat test. There is a document which explains these questions.
+
+With inverse results: 
+
+Reliability analysis
+raw_alpha: 0.81
+std.alpha:0.8
+G6(smc): 0.82 
+average_r: 0.37 
+S/N: 4.1
+ase: 0.019
+mean: 5.9
+sd: 0.9
+
+If item should be excluded than I would leave math_grade out of the equation. These questions are about self perceived competence and therefor subjective. It isn't about real competence.
+
+Inverse without math_grade: 
+
+Reliability analysis
+raw_alpha: 0.83
+std.alpha: 0.84
+G6(smc): 0.84
+average_r: 0.46
+S/N: 5.1
+ase: 0.018
+mean: 4.4
+sd: 0.99
+
+With such a high raw_alpha we can state that this test is good.
+
+Cor: 0.270721
+
+The two stats could be slightly correlated. This is because math is about statistics but also a lot more different subjects. So if you are good in math than there is quite a good chance that you will be good in other area's as well. Like statistics.
+
+#Excercise 6
+
+```{r, fig.width=5, fig.height=5}
+library(psych)
+satsintelligence <- c("Q12", "Q20", "Q23", "Q29")
+satsQ2 <- c("Q5", "Q11", "Q26", "Q31", "Q32", "Q35")
+sc <- sats[satsQ2]
+SATSintelligence <- sats[satsintelligence]
+(result <- alpha(SATSintelligence))
+(summary(result))
+SATSintelligence$intelligencemean=rowMeans(SATSintelligence[,c("Q12", "Q20", "Q23", "Q29")], na.rm=TRUE)
+cor(SATSintelligence$intelligencemean, sats$satscomp, use = "pairwise.complete.obs")
+plot(SATSintelligence$intelligencemean, sats$satscomp)
+abline(lm(sats$satscomp ~ SATSintelligence$intelligencemean))
+```
+
+
+Reliability analysis
+raw_alpha: 0.87 
+std.alpha: 0.87 
+G6(smc): 0.85 
+average_r: 0.63 
+S/N: 6.7
+ase: 0.012
+mean: 4.9
+sd: 1
+
+mean: 0.2841911
+
+
+The test has a high aplha so the test is good. Therefor there doesn't have be a change in the number of questions. It can stay as it is.
+
+
+Cronbac's alpha depends on the following things. First of it needs the average correlation of all the variables for example questions. Secondly it needs the number of all the question. If you remove a question it can change the cronbach's alpha. We can state the test is acceptable when the alpha is above 0.7, good when the alpha is above 0.8 and very good when the alpha is above 0.9. When the alpha is above 0.7 we can use the mean of the items as summary of the scale.
+
+The two are correlated. This is because people who are interested in a specific subject will likely perform better than someone who isn't interested. Therefor people who are interested in statistics will be more likely to say that they are better than they might are. 
+
+
+
+
+
+
+
+

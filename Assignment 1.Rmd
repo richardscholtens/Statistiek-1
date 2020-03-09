@@ -1,0 +1,66 @@
+---
+title: "Statistiek - Lab session 1"
+author: "J.F.P. (Richard) Scholtens (s2956586)"
+date: "Generated on: `r date()`"
+output: 
+  html_document:
+    toc: true
+    code_folding: show
+    toc_float: 
+        collapsed: false
+        smooth_scroll: true
+    number_sections: true
+---
+
+
+# Exercise 1
+
+In the swirl lessons I learned the bassic commands of R to provide a better understanding in how the systems works. With this knowledge it is easyer to communicate with the program. So they thaught me how to store variables using <- and how to make sequences with seq().With length(variable) you can determine the length of the vector. It is also possible to index the vectors.
+
+Index vectors come in four different flavors. Logical vectors, vectors of positive integers, vectors of negative integers, and vectors of character strings. Furthermore, it is possible to use normal calculation to show outcomes of mathmatical equations. Even vectors can be used in these equations.
+
+
+
+```{r, fig.width=5, fig.height=5}
+# R code for this exercise goes between the ```'s 
+# Lines which start with a '#' are comments and not executed.
+# Remove the '#' at the start of the next line and press the Knit HTML button
+R.version.string
+dat <- read.csv('data.csv',sep=';',dec='.') # this command imports the data.csv in R
+str(dat)
+```
+
+The code above shows the current version of R that is being used and makes it possible to read CSV data extentions within the same folder as the template. 
+
+# Exercise 2 
+
+```{r, fig.width=5, fig.height=5}
+dat$participant <- as.factor(dat$participant)
+str(dat)
+```
+
+# Exercise 3
+
+```{r, fig.width=5, fig.height=5}
+mean(dat$english_grade)
+mean(dat$english_grade[dat$gender=="M"])
+table(dat$gender, dat$study)
+```
+
+There are more woman than men studying. However Information Science is more studied 
+by men than woman.
+
+#Excercise 4
+
+```{r, fig.width=5, fig.height=5}
+gendertable <- table(dat$gender)
+gendertable
+bltable <- table(dat$bl_edu)
+bltable
+
+barplot(gendertable, main="Are you male or female?", col=c("darkblue","red"), ylab="Frequency", xlab="Awnser", ylim=c(0,15))
+barplot(bltable, main="Do you have a multilangual study?", col=c("darkblue","red"), ylab="Frequency", xlab="Awnser", ylim=c(0,20))
+
+```
+
+
